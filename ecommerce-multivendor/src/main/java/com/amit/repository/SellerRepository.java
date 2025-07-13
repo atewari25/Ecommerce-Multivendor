@@ -1,0 +1,9 @@
+package com.amit.repository;
+
+import com.amit.model.Seller;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SellerRepository extends JpaRepository<Seller, Long> {
+
+    Seller findByEmail(String email);
+}
