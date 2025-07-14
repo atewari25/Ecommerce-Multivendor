@@ -4,6 +4,7 @@ import com.amit.domain.USER_ROLE;
 import com.amit.model.User;
 import com.amit.model.VerificationCode;
 import com.amit.repository.UserRepository;
+import com.amit.request.LoginRequest;
 import com.amit.response.ApiResponse;
 import com.amit.response.AuthResponse;
 import com.amit.response.SignupRequest;
@@ -45,5 +46,13 @@ public class AuthController {
 
 
         return ResponseEntity.ok(res);
+    }
+
+    @PostMapping("/signing")
+    public ResponseEntity<AuthResponse> loginHandler(@RequestBody LoginRequest req) throws Exception {
+
+       AuthResponse authResponse =  authService.signing(req);
+
+        return ResponseEntity.ok(authResponse);
     }
 }
