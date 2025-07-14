@@ -25,4 +25,15 @@ public class VerificationCode {
 
     @OneToOne
     private Seller seller;
+
+    @Override
+    public String toString() {
+        return "VerificationCode{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", otp='" + otp + '\'' +
+                '}';
+    }
+
+
 }

@@ -4,10 +4,14 @@ import com.amit.config.JwtProvider;
 import com.amit.domain.USER_ROLE;
 import com.amit.model.Cart;
 import com.amit.model.User;
+import com.amit.model.VerificationCode;
 import com.amit.repository.CartRepository;
 import com.amit.repository.UserRepository;
+import com.amit.repository.VerificationCodeRepository;
 import com.amit.response.SignupRequest;
 import com.amit.service.AuthService;
+import com.amit.service.EmailService;
+import com.amit.utils.OtpUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,14 +26,53 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
     private final JwtProvider jwtProvider;
+    private final VerificationCodeRepository verificationCodeRepository;
+    private final EmailService emailService;
 
     @Override
-    public String createUser(SignupRequest req) {
+    public void sentLoginOtp(String email) throws Exception {
+        String SIGNING_PREFIX = "signin_";
+        if(email.startsWith(SIGNING_PREFIX)){
+            email = email.substring(SIGNING_PREFIX.length());
+
+            User user = userRepository.findByMail(email);
+            if(user == null){
+                throw new Exception("User not found with email: " + email);
+            }
+        }
+
+        VerificationCode isExists = verificationCodeRepository.findByEmail(email);
+        if(isExists!=null){
+             verificationCodeRepository.delete(isExists);
+        }
+
+        String otp = OtpUtil.generateOtp();
+        VerificationCode verificationCode = new VerificationCode();
+        verificationCode.setOtp(otp);
+        verificationCode.setEmail(email);
+        verificationCodeRepository.save(verificationCode); // Save the verification code to the database
+
+        String subject = "Baazar - Login OTP";
+        String text = "Your OTP for login is: " + otp;
+
+        emailService.sendVerificationOtpEmail(email, otp, subject, text); // Send the OTP via email
+
+
+    }
+
+    @Override
+    public String createUser(SignupRequest req) throws Exception {
+        VerificationCode verificationCode =  verificationCodeRepository.findByEmail(req.getEmail());
+
+        if(verificationCode == null || !verificationCode.getOtp().equals(req.getOtp())){
+            throw new Exception("wrong otp...");
+        }
+
         User user = userRepository.findByMail(req.getEmail());
         if(user==null) {
             User createdUser = new User();
