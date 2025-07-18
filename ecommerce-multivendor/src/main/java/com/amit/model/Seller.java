@@ -11,7 +11,7 @@ import lombok.*;
 @EqualsAndHashCode
 @Getter
 @Setter
-public class Seller {
+public class  Seller {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -19,6 +19,8 @@ public class Seller {
     private String sellerName;
 
     private  String mobile;
+
+    private Boolean emailVerified = false;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -39,14 +41,5 @@ public class Seller {
     private USER_ROLE role = USER_ROLE.SELLER;
 
     private AccountStatus accountStatus = AccountStatus.PENDING_VERIFICATION;
-
-
-
-
-
-
-
-
-
 
 }
