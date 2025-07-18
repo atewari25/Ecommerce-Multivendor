@@ -1,9 +1,8 @@
 package com.amit.controller;
 
 import com.amit.domain.USER_ROLE;
-import com.amit.model.User;
-import com.amit.model.VerificationCode;
 import com.amit.repository.UserRepository;
+import com.amit.request.LoginOtpRequest;
 import com.amit.request.LoginRequest;
 import com.amit.response.ApiResponse;
 import com.amit.response.AuthResponse;
@@ -37,13 +36,11 @@ public class AuthController {
     }
 
     @PostMapping("/sent/login-signup-otp")
-    public ResponseEntity<ApiResponse> otpHandler(@RequestBody VerificationCode req) throws Exception {
-        authService.sentLoginOtp(req.getEmail());
+    public ResponseEntity<ApiResponse> otpHandler(@RequestBody LoginOtpRequest req) throws Exception {
 
+        authService.sentLoginOtp(req.getEmail(), req.getRole());
         ApiResponse res = new ApiResponse();
-
         res.setMessage("otp sent Successfully");
-
 
         return ResponseEntity.ok(res);
     }
